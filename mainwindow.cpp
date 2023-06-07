@@ -1,3 +1,5 @@
+#include <QtWidgets>
+
 #include "mainwindow.h"
 #include "./ui_mainwindow.h"
 
@@ -44,7 +46,7 @@ void MainWindow::open() {
 void MainWindow::save() {
 
     QAction *action = qobject_cast<QAction *>(sender());
-    QByte fileFormat = action->data().toByteArray();
+    QByteArray fileFormat = action->data().toByteArray();
     saveFile(fileFormat);
 
 }
@@ -52,7 +54,7 @@ void MainWindow::save() {
 void MainWindow::penColor() {
 
     QColor new_color = QColorDialog::getColor(scribble_area->penColor());
-    if (newColor.isValid()) {
+    if (new_color.isValid()) {
         scribble_area->setPenColor(new_color);
     }
 
@@ -61,7 +63,7 @@ void MainWindow::penColor() {
 void MainWindow::penWidth() {
 
     bool ok;
-    int new_width = QInputDialog::getInteger(this, tr("Scribble"), tr("Select pen width : "), scribble_area->penWidth(), 1, 50, 1, &ok);
+    int new_width = QInputDialog::getInt(this, tr("Scribble"), tr("Select pen width : "), scribble_area->penWidth(), 1, 50, 1, &ok);
 
     if (ok) {
         scribble_area->setPenWidth(new_width);
@@ -115,6 +117,61 @@ void MainWindow::createActions() {
 
 void MainWindow::createMenus() {
 
+    saveAsMenu = new QMenu(tr("&Save As"), this);
+    foreach(QAction *action, saveAsAction) {
+        saveAsMenu->addAction(action);
+    }
+
+    fileMenu = new QMenu(tr("&File"), this);
+
+    fileMenu->addAction(openAction);
+    fileMenu->addMenu(saveAsMenu);
+    fileMenu->addAction(printAction);
+    fileMenu->addSeparator();
+    fileMenu->addAction(exitAction);
+
+    optionMenu = new QMenu(tr("&Options"), this);
+    optionMenu->addAction(penColorAction);
+    optionMenu->addAction(penWidthAction);
+    optionMenu->addSeparator();
+    optionMenu->addAction(clearScreenAction);
+
+    helpMenu = new QMenu(tr("&Help"), this);
+    helpMenu->addAction(aboutAction);
+    helpMenu->addAction(aboutQtAction);
+
+    menuBar()->addMenu(fileMenu);
+    menuBar()->addMenu(optionMenu);
+    menuBar()->addMenu(helpMenu);
+
+}
+
+bool MainWindow::maybeSave() {
+
+    if (scribble_area->isModified()) {
+        QMessageBox::StandardButton return_value;
+
+        return_value = QMessageBox::warning(this, tr("Scribble"), tr("The image has been modified.\nDo want to save changes?"), QMessageBox::Save | QMessageBox::Discard | QMessageBox::Cancel);
+
+        if (return_value == QMessageBox::Save) {
+            return saveFile("png");
+        } else if (return_value == QMessageBox::Cancel) {
+            return false;
+        }
+    }
+
+    return true;
+}
+
+bool MainWindow::saveFile(const QByteArray &fileFormat) {
+    QString initialPath = QDir::currentPath() + "/untitled" + fileFormat;
+    QString filename = QFileDialog::getSaveFileName(this, tr("Save As"), initialPath, tr("%1 Files (*.%2):: All Files(*)").arg(QString::fromLatin1(fileFormat.toUpper())).arg(QString::fromLatin1(fileFormat)));
+
+    if (filename.isEmpty()) {
+        return false;
+    } else {
+        return scribble_area->saveImage(filename, fileFormat.constData());
+    }
 }
 
 MainWindow::~MainWindow()

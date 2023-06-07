@@ -45,6 +45,7 @@ private:
 
     QAction *openAction;
     QList<QAction *> saveAsAction;
+    QAction *exitAction;
     QAction *penColorAction;
     QAction *penWidthAction;
     QAction *printAction;

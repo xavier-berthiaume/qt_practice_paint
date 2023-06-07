@@ -37,11 +37,12 @@ protected:
 
 private:
     void drawLineTo(const QPoint &endPoint);
-    void resizeImage(QImage &image, const QSize &newSize);
+    void resizeImage(QImage *image, const QSize &newSize);
 
     bool modified;
     bool scribbling;
     QColor myPenColor;
+    int myPenWidth;
     QImage image;
     QPoint lastPoint;
 

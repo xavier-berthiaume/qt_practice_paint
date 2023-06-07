@@ -18,6 +18,7 @@ set(PROJECT_SOURCES
         mainwindow.h
         mainwindow.ui
 
+        scribble.cpp
         scribble.h
 )
 
