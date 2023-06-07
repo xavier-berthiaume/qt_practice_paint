@@ -75,6 +75,48 @@ void MainWindow::about() {
 
 }
 
+void MainWindow::createActions() {
+
+    openAction = new QAction(tr("&Open"), this);
+    openAction->setShortcut(QKeySequence::Open);
+    connect(openAction, SIGNAL(triggered()), this, SLOT(open()));
+
+    foreach(QByteArray format, QImageWriter::supportedImageFormats()) {
+        QString text = tr("%1...").arg(QString(format).toUpper());
+        QAction *action = new QAction(text,this);
+        action->setData(format);
+        connect(action, SIGNAL(triggered()), this, SLOT(save()));
+        saveAsAction.append(action);
+    }
+
+    printAction = new QAction(tr("&Print..."), this);
+    connect(printAction, SIGNAL(triggered()), scribble_area, SLOT(print()));
+
+    exitAction = new QAction(tr("E&xit"), this);
+    exitAction->setShortcuts(QKeySequence::Quit);
+    connect(exitAction, SIGNAL(triggered()), this, SLOT(close()));
+
+    penColorAction = new QAction(tr("&Pen Color..."), this);
+    connect(penColorAction, SIGNAL(triggered()), this, SLOT(penColor()));
+
+    penWidthAction = new QAction(tr("&Pen Width..."), this);
+    connect(penWidthAction, SIGNAL(triggered()), this, SLOT(penWidth()));
+
+    clearScreenAction = new QAction(tr("&Clear Screen..."), this);
+    clearScreenAction->setShortcut(tr("Ctrl+L"));
+    connect(clearScreenAction, SIGNAL(triggered()), this, SLOT(clearImage()));
+
+    aboutAction = new QAction(tr("&About..."), this);
+    connect(aboutAction, SIGNAL(triggered()), this, SLOT(about()));
+
+    aboutQtAction = new QAction(tr("About &Qt"));
+    connect(aboutQtAction, SIGNAL(triggered()), this, SLOT(aboutQt()));
+}
+
+void MainWindow::createMenus() {
+
+}
+
 MainWindow::~MainWindow()
 {
     delete ui;
